@@ -71,7 +71,7 @@ Elliptical k-space shutter =	"default";
 Total scan duration =		"08:48.0";
 Act. TR/TE (ms) =		"2000 / 30";
 Min. TR/TE (ms) =		"1463 / 26";
-Series TE (ms) =		"30/40/50/60/70/80/90/100/110/120/130/140/150/160/170/180/190/200/210/220/230";
+Series TE (ms) = "30/40/50/60/70/80/90/100/110/120/130/140/150/160/170/180/190/200/210/220/230/240/250/260";
 Spectral resolution (Hz/point)= 0.9765625;
 Readout duration (ms) =		1024;
 SAR / head =			"<  8 %";
@@ -82,3 +82,32 @@ Max B1+rms =			"0.64 uT";
 PNS / level =			"79 % / normal";
 dB/dt =				"61.8 T/s";
 Sound Pressure Level (dB) =	0;
+
+
+
+Some observations and possible modifications:
+
+1) The above protocoll consists of 24 single voxel spectrum acquisitions
+   with TE's starting at 30ms up to 260ms in steps of 10ms.
+   For quantification relative to the unsuppressed water signal a reference spectrum 
+   is included for each TE. Total acquisition time is just below 9min  
+
+2) For those who are in hurry the acquisition time can be reduced to 7min
+   setting "Startup acquisitions = 0", however this will introduce a slight error 
+   due to T1 relaxation, mainly in the first TE. But this is certainly less troublesome than
+   reducing the number of TE's, by the contrary, it could be desirable to further increase
+   this number to be able to more precisely measure T2 of long decay metabolites such as NAA.
+
+3) If the purpose of the experiment is exclusively to measure T2 relaxation times without the
+   need of absolute quantification of metabolite concentrations, then, and only then, the 
+   water reference could be disabled by setting "Spectral correction = no" which saves some 
+   aditional time.
+   In this specific case it also can be helpful to specify non equally spaced TE's
+   For example: 30,40,60,100,180,340,660ms
+   CAUTION: the MRS_T2fit software currently only can deal with non equally spaced TE's
+   when DICOM input files are specified, since the SDAT file only contains the value 
+   of the first TE.
+
+4) If scan time is less of an issue it could be interesting to increase TR (e.g. >= 4000ms)
+   NSA/#phasecycles (e.g. 16) and eventually also the spectral correction NSA (e.g. 2).
+   However all of the above together would result in a scan time of approximately 30min.
