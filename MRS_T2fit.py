@@ -406,15 +406,6 @@ if isDICOM (filename):  # read DICOM
         ActRef=2 # two spectra, actual and water, this is the normal case
     elif ndata_points==rows*samples*ReIm: 
         ActRef=1 # only one spectrum
-        try: watersup = Dset.SpectrallySelectedSuppression
-        except: 
-            lprint ('ERROR: reading DICOM tag informing if water supression was enabled (sorry)')
-            exit(1)
-        # only accept spectra without water supression (untested)
-        if watersup.lower() == "water": 
-            lprint ('ERROR: spectro seems to have water supression enabled (sorry)')
-            exit(1)
-        # if OK go on (and hope the best;) ...
     else: 
         lprint ('ERROR: Unexpected number of total datapoints'); exit(1)  
     # read TE values
@@ -423,13 +414,6 @@ if isDICOM (filename):  # read DICOM
         TE[i]=Dset.PerFrameFunctionalGroupsSequence[i].MREchoSequence[0].EffectiveEchoTime
     if TE[1:].tolist()==TE[:-1].tolist(): # all elements equal (to check TE=numpy.array([1,1,1]))
         lprint ('ERROR:: all TEs are equal'); exit(1)
-    # read TR values
-    TRs = numpy.zeros(shape=(rows))
-    for i in range (0, rows): 
-        TRs[i]=Dset.PerFrameFunctionalGroupsSequence[i].MRTimingandRelatedParameters[0].RepetitionTime
-    if TRs[1:].tolist()!=TRs[:-1].tolist(): # not all elements equal 
-        lprint ('ERROR: TR seems to vary along scans'); exit(1)
-    TR=TRs[0]
     #read data
     spectro_rawdata = numpy.asarray(Dset[0x5600,0x0020].value)
 else: # read SDAT
@@ -449,7 +433,6 @@ else: # read SDAT
     # open SPAR
     try: input = open(SPARfile, "r").readlines()
     except: lprint ('ERROR: reading SPAR file'); exit(1)
-    TR  = float(_get_from_SPAR (input, 'repetition_time'))
     TE_first = float(_get_from_SPAR (input, 'echo_time'))
     samples = int(_get_from_SPAR (input, 'samples'))
     rows = int(_get_from_SPAR (input, 'rows'))
